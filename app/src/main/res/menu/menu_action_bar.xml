@@ -33,21 +33,6 @@
         app:showAsAction="never"
         android:title="Rewards" />
     <item
-        android:id="@+id/menu_bugreport"
-        android:icon="@android:drawable/ic_menu_send"
-        app:showAsAction="never"
-        android:title="@string/menu_bugreport" />
-    <item
-        android:id="@+id/menu_review"
-        android:icon="@android:drawable/ic_menu_edit"
-        app:showAsAction="never"
-        android:title="@string/dialog_say_thanks_title" />
-    <item
-        android:id="@+id/menu_share"
-        app:actionProviderClass="androidx.appcompat.widget.ShareActionProvider"
-        app:showAsAction="never"
-        android:title="@string/menu_share" />
-    <item
         android:id="@+id/menu_about"
         app:showAsAction="never"
         android:title="@string/menu_about_title" />

@@ -62,10 +62,6 @@ class ActionBarHandler(
             putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID)
         }
 
-        val menuItem = menu.findItem(R.id.menu_share)
-        val sp = MenuItemCompat.getActionProvider(menuItem) as androidx.appcompat.widget.ShareActionProvider
-        sp.setShareIntent(intent)
-
         sub = store.editing().subscribe { edited ->
             val showDelete = edited.isEdited && !edited.isNew
 
@@ -92,8 +88,6 @@ class ActionBarHandler(
         when (item.itemId) {
             R.id.menu_item_settings -> mContext.startActivity(Intent(mContext, SettingsActivity::class.java))
             R.id.menu_item_rewards -> mContext.startActivity(Intent(mContext, RewardsActivity::class.java))
-            R.id.menu_review -> showSayThanks()
-            R.id.menu_bugreport -> showBugreport()
             R.id.set_alarm_menu_delete_alarm -> deleteAlarm()
             R.id.menu_about -> showAbout()
             android.R.id.home -> store.onBackPressed().onNext("ActionBar")
