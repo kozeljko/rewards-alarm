@@ -20,16 +20,22 @@ class SolveAdapter(
     class ScoreViewHolder(val binding: RewardLayoutBinding, val rewardView: TextView, private val rewardorinos: Rewards? = globalInject(Rewards::class.java).value) : RecyclerView.ViewHolder(binding.root){
         //val binding: RewardLayoutBinding = binding
         fun bind(item: Reward){
+            val tv: TextView = binding.tvReward;
             binding.tvReward.text = item.name
             binding.tvCost.text = item.cost.toString()
+            //!! kek
+            if (rewardorinos!!.getPurchase(item.index)){
+                tv.paintFlags = tv.paintFlags or STRIKE_THRU_TEXT_FLAG
+                binding.tvCost.text = ""
+            }
 
-            val tv: TextView = binding.tvReward;
             tv.setOnClickListener{
                 tv.paintFlags = tv.paintFlags or STRIKE_THRU_TEXT_FLAG
                 val cost: Int = (binding.tvCost.text as String).toInt()
                 rewardorinos?.decreaseRewardPoints(cost)
                 binding.tvCost.text = ""
                 rewardView.text = rewardorinos?.rewardPoints.toString()
+                rewardorinos.purchase(item.index)
             }
         }
     }

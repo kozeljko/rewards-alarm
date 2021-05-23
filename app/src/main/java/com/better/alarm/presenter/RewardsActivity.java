@@ -59,10 +59,10 @@ public class RewardsActivity extends AppCompatActivity {
         if (!getResources().getBoolean(R.bool.isTablet)) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
-        rewards.add(new Reward(100, "Sorting Algorithms"));
-        rewards.add(new Reward(200, "Soothing Violin"));
-        rewards.add(new Reward(50, "Chainsaw"));
-        rewards.add(new Reward(130, "Fewer numbers"));
+        rewards.add(new Reward(0, 200, "Soothing Violin"));
+        rewards.add(new Reward(1, 100, "Sorting Algorithms"));
+        rewards.add(new Reward(2, 50, "Chainsaw"));
+        rewards.add(new Reward(3, 130, "Fewer numbers"));
 
         ((TextView) findViewById(R.id.tvRewardCash)).setText(rewardorinos.getRewardPoints().toString());
 
