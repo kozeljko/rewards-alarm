@@ -70,7 +70,7 @@
         <!-- This activity is basically the same as AlarmAlert
              but full-screen so that it can turn the display on. -->
         <activity
-            android:name=".alert.AlarmAlertFullScreen"
+            android:name=".alert.AnnoyingAlarmAlertFullScreen"
             android:configChanges="orientation|keyboardHidden|keyboard|navigation"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
