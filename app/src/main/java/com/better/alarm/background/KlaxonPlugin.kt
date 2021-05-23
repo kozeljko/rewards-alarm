@@ -86,7 +86,15 @@ class KlaxonPlugin(
             player?.run {
                 try {
                     setPerceivedVolume(0f)
-                    setDataSource(alarm.alarmtone)
+
+                    val soundResource = when(alarm.alarmtone.persistedString) {
+                        "Sorting algorithm beat" -> R.raw.sorting_algos
+                        "Steel drums" -> R.raw.steel_drums
+                        "Bad flute" -> R.raw.fallbackring
+                        else -> R.raw.fallbackring
+                    }
+
+                    setDataSourceFromResource(soundResource)
                     startAlarm()
                 } catch (ex: Exception) {
                     log.w("Using the fallback ringtone")

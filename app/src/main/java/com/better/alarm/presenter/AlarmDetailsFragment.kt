@@ -18,10 +18,9 @@
 package com.better.alarm.presenter
 
 import android.annotation.TargetApi
-import android.content.Intent
+import android.app.Dialog
 import android.media.Ringtone
 import android.media.RingtoneManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
@@ -31,14 +30,11 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.better.alarm.R
-import com.better.alarm.checkPermissions
 import com.better.alarm.configuration.Layout
 import com.better.alarm.configuration.Prefs
 import com.better.alarm.configuration.globalInject
@@ -48,7 +44,6 @@ import com.better.alarm.logger.Logger
 import com.better.alarm.lollipop
 import com.better.alarm.model.AlarmValue
 import com.better.alarm.model.Alarmtone
-import com.better.alarm.model.ringtoneManagerString
 import com.better.alarm.util.Optional
 import com.better.alarm.util.modify
 import com.better.alarm.view.showDialog
@@ -59,11 +54,31 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.disposables.Disposables
 import io.reactivex.schedulers.Schedulers
-import java.util.Calendar
+import java.util.*
 
 /**
  * Details activity allowing for fine-grained alarm modification
  */
+
+interface MyCallbackInterface {
+    fun passString(result: String?)
+}
+
+class FireMissilesDialogFragment(val callback: MyCallbackInterface) : DialogFragment() {
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return activity?.let {
+            val builder = AlertDialog.Builder(it)
+            val values = arrayOf("Sorting algorithm beat", "Steel drums", "Bad flute")
+            builder.setTitle("Pick an unlocked alarm sound")
+                    .setItems(values, { dialog, which -> callback.passString(values[which])})
+            builder.create()
+        } ?: throw IllegalStateException("Activity cannot be null")
+
+    }
+}
+
+
 class AlarmDetailsFragment : Fragment() {
     private val alarms: IAlarmsManager by globalInject()
     private val logger: Logger by globalLogger("AlarmDetailsFragment")
@@ -171,22 +186,15 @@ class AlarmDetailsFragment : Fragment() {
         }
 
         mRingtoneRow.setOnClickListener {
-            editor.firstOrError().subscribe { editor ->
-                try {
-                    startActivityForResult(Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
-                        putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, editor.alarmtone.ringtoneManagerString())
-
-                        putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
-                        putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
-
-                        putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true)
-                        putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM)
-                    }, 42)
-                } catch (e: Exception) {
-                    Toast.makeText(context, requireContext().getString(R.string.details_no_ringtone_picker), Toast.LENGTH_LONG)
-                            .show()
+            val handler = object : MyCallbackInterface {
+                override fun passString(result: String?) {
+                    mRingtoneSummary.text = result
+                    onSelectRingtone(result)
                 }
             }
+
+            val newFragment = FireMissilesDialogFragment(handler)
+            newFragment.show(alarmsListActivity.supportFragmentManager, "missiles")
         }
 
         class TextWatcherIR : TextWatcher {
@@ -211,25 +219,11 @@ class AlarmDetailsFragment : Fragment() {
         return view
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (data != null && requestCode == 42) {
-            val alert: String? = data.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)?.toString()
+    fun onSelectRingtone(selectedAlarm: String?) {
+        val alarmtone = Alarmtone.Sound(selectedAlarm ?: "Dunno")
 
-            logger.debug { "Got ringtone: $alert" }
-
-            val alarmtone = when (alert) {
-                null -> Alarmtone.Silent()
-                RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM).toString() -> Alarmtone.Default()
-                else -> Alarmtone.Sound(alert)
-            }
-
-            logger.debug { "onActivityResult $alert -> $alarmtone" }
-
-            checkPermissions(requireActivity(), listOf(alarmtone))
-
-            modify("Ringtone picker") { prev ->
-                prev.copy(alarmtone = alarmtone, isEnabled = true)
-            }
+        modify("Ringtone picker") { prev ->
+            prev.copy(alarmtone = alarmtone, isEnabled = true)
         }
     }
 
@@ -262,7 +256,7 @@ class AlarmDetailsFragment : Fragment() {
                     when (editor.alarmtone) {
                         is Alarmtone.Silent -> requireContext().getText(R.string.silent_alarm_summary)
                         is Alarmtone.Default -> RingtoneManager.getRingtone(context, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)).title()
-                        is Alarmtone.Sound -> RingtoneManager.getRingtone(context, Uri.parse(editor.alarmtone.uriString)).title()
+                        is Alarmtone.Sound -> editor.alarmtone.uriString
                     }
                 }.observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
