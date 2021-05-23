@@ -4,7 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import com.better.alarm.R
-import com.better.alarm.alert.AlarmAlertFullScreen
+//import com.better.alarm.alert.AlarmAlertFullScreen
+import com.better.alarm.alert.AnnoyingAlarmAlertFullScreen
 
 class DynamicThemeHandler(context: Context) {
     private val themeKey = "theme"
@@ -34,11 +35,11 @@ class DynamicThemeHandler(context: Context) {
     private fun preference(): String = sp.getString(themeKey, dark) ?: dark
 
     fun getIdForName(name: String): Int = when {
-        preference() == light && name == AlarmAlertFullScreen::class.java.name -> R.style.AlarmAlertFullScreenLightTheme
+        preference() == light && name == AnnoyingAlarmAlertFullScreen::class.java.name -> R.style.AlarmAlertFullScreenLightTheme
         preference() == light && name == TimePickerDialogFragment::class.java.name -> R.style.TimePickerDialogFragmentLight
-        preference() == dark && name == AlarmAlertFullScreen::class.java.name -> R.style.AlarmAlertFullScreenDarkTheme
+        preference() == dark && name == AnnoyingAlarmAlertFullScreen::class.java.name -> R.style.AlarmAlertFullScreenDarkTheme
         preference() == dark && name == TimePickerDialogFragment::class.java.name -> R.style.TimePickerDialogFragmentDark
-        preference() == synthwave && name == AlarmAlertFullScreen::class.java.name -> R.style.AlarmAlertFullScreenSynthwaveTheme
+        preference() == synthwave && name == AnnoyingAlarmAlertFullScreen::class.java.name -> R.style.AlarmAlertFullScreenSynthwaveTheme
         preference() == synthwave && name == TimePickerDialogFragment::class.java.name -> R.style.TimePickerDialogFragmentSynthwave
         else -> defaultTheme()
     }
