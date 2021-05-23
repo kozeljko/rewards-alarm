@@ -122,6 +122,11 @@ android {
         jvmTarget = "1.8"
         useIR = true
     }
+
+    buildFeatures {
+        dataBinding = true
+    }
+
 }
 
 dependencies {

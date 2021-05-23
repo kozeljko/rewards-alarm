@@ -17,15 +17,7 @@ import com.better.alarm.logger.LogcatLogWriter
 import com.better.alarm.logger.Logger
 import com.better.alarm.logger.LoggerFactory
 import com.better.alarm.logger.StartupLogWriter
-import com.better.alarm.model.AlarmCore
-import com.better.alarm.model.AlarmCoreFactory
-import com.better.alarm.model.AlarmSetter
-import com.better.alarm.model.AlarmStateNotifier
-import com.better.alarm.model.Alarms
-import com.better.alarm.model.AlarmsScheduler
-import com.better.alarm.model.Calendars
-import com.better.alarm.model.ContainerFactory
-import com.better.alarm.model.IAlarmsScheduler
+import com.better.alarm.model.*
 import com.better.alarm.persistance.DatabaseQuery
 import com.better.alarm.persistance.PersistingContainerFactory
 import com.better.alarm.presenter.AlarmsListActivity
@@ -105,6 +97,7 @@ fun startKoin(context: Context): Koin {
         single<DatabaseQuery> { DatabaseQuery(get(), get()) }
         single<AlarmCoreFactory> { AlarmCoreFactory(logger("AlarmCore"), get(), get(), get(), get(), get()) }
         single<Alarms> { Alarms(get(), get(), get(), get(), logger("Alarms")) }
+        single<Rewards> { Rewards()}
         factory<IAlarmsManager> { get<Alarms>() }
         single { ScheduledReceiver(get(), get(), get(), get()) }
         single { ToastPresenter(get(), get()) }
